@@ -1,0 +1,24 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "copyblockid"
+version = "1.0.0"
+displayName = "CopyBlockId"
+authors = "wodichka"
+description = '''Client-side NeoForge mod that copies the targeted block ID to the clipboard with Ctrl+C.'''
+
+[[dependencies."copyblockid"]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.230,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies."copyblockid"]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "CLIENT"
