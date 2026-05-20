@@ -1,88 +1,64 @@
 # CopyBlockId
 
-A lightweight client-side utility mod for NeoForge 1.21.1 that allows you to instantly copy block IDs directly from the game world using `Ctrl+C`.
+CopyBlockId is a lightweight client-side utility mod for NeoForge 1.21.1. Press `Ctrl+C` to copy registry IDs directly from Minecraft without digging through debug screens, configs, or command output.
 
-When you look at a block and press `Ctrl+C`, the mod copies the block registry ID to your clipboard, for example:
+## What It Copies
+
+- The block ID you are currently looking at, if enabled in the client config
+- The entity ID you are currently looking at, if enabled in the client config
+- The item ID of the hovered inventory slot
+- Hovered item and fluid IDs from JEI and REI overlays/tooltips
+
+Example clipboard output:
 
 ```text
 minecraft:dirt
 ```
 
-The mod will also show a hotbar-style overlay notification when something is copied.
+When a value is copied, the mod shows a short in-game notification.
 
----
+## Why It Is Useful
 
-## Features
+- Modpack development
+- KubeJS and datapack scripting
+- Commands and config editing
+- Quick registry lookups while testing
 
-- Instantly copy block IDs from the world
-- Copies hovered inventory item IDs
-- Copies hovered item and fluid IDs from JEI and REI overlays/tooltips
-- Does not interfere with chat or GUI shortcuts
-- Lightweight and client-side only
-- Useful for:
-  - Modpack development
-  - KubeJS scripting
-  - Commands and datapacks
-  - Config editing
-  - Debugging
+## Controls
 
----
+- `Ctrl+C` while looking at an entity: copies the targeted entity ID when `copyTargetedEntityInWorld` is enabled
+- `Ctrl+C` in the world: copies the targeted block ID when `copyTargetedBlockInWorld` is enabled
+- `Ctrl+C` over an inventory slot: copies the hovered item ID
+- `Ctrl+C` over JEI or REI entries: copies the hovered ingredient ID
+
+The shortcut is ignored while typing in chat or focused text fields.
+
+## Config
+
+CopyBlockId creates a client config at `config/copyblockid-client.toml`.
+
+- `copyTargetedBlockInWorld = false` by default. Set it to `true` to allow `Ctrl+C` in the world to copy the ID of the block you are looking at
+- `copyTargetedEntityInWorld = false` by default. Set it to `true` to allow `Ctrl+C` in the world to copy the ID of the entity you are looking at
 
 ## Requirements
 
-- Minecraft 1.21.1
-- NeoForge 21.1.230
-- Java 21
+- Minecraft `1.21.1`
+- NeoForge `21.1.230`
+- Java `21`
 
----
-
-## Installation
-
-1. Build the mod:
-
-   ```powershell
-   .\gradlew.bat clean build
-   ```
-
-2. Move the generated `.jar` file from `build/libs/` into your Minecraft `mods` folder.
-3. Launch Minecraft with NeoForge 1.21.1.
-
----
-
-## Usage
-
-1. Join a world
-2. Look at a block in inventory
-3. Press `Ctrl+C`
-4. Paste the clipboard contents anywhere
-
-Example output:
-
-```text
-minecraft:dirt
-```
-
-In supported inventory screens, `Ctrl+C` copies the hovered slot item ID.
-
-When hovering items or fluids in JEI or REI overlays, `Ctrl+C` copies the hovered ingredient registry ID.
-
-`Ctrl+C` inside chats and focused text fields is not intercepted by the mod.
-
----
-
-## Building
+## Build
 
 ```powershell
 .\gradlew.bat clean build
 ```
 
-To run the development client:
+The built jar will appear in `build/libs/`.
+
+## Run Dev Client
 
 ```powershell
 .\gradlew.bat runClient
 ```
-
----
 
 ## License
 

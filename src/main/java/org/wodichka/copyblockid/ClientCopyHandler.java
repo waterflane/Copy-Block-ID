@@ -17,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
@@ -120,7 +122,7 @@ public final class ClientCopyHandler {
 
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.screen == null) {
-            copyTargetedBlockId(minecraft);
+            copyTargetedWorldValue(minecraft);
         }
     }
 
@@ -198,20 +200,42 @@ public final class ClientCopyHandler {
         return true;
     }
 
-    private static void copyTargetedBlockId(Minecraft minecraft) {
+    private static boolean copyTargetedWorldValue(Minecraft minecraft) {
+        return ClientConfig.canCopyTargetedEntityInWorld() && copyTargetedEntityId(minecraft)
+                || ClientConfig.canCopyTargetedBlockInWorld() && copyTargetedBlockId(minecraft);
+    }
+
+    private static boolean copyTargetedEntityId(Minecraft minecraft) {
         if (minecraft.screen != null || minecraft.level == null || minecraft.player == null) {
-            return;
+            return false;
+        }
+
+        HitResult hitResult = minecraft.hitResult;
+        if (!(hitResult instanceof EntityHitResult entityHitResult) || hitResult.getType() != HitResult.Type.ENTITY) {
+            return false;
+        }
+
+        Entity entity = entityHitResult.getEntity();
+        ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+        INSTANCE.copyIdToClipboardAndNotify(minecraft, entityId);
+        return true;
+    }
+
+    private static boolean copyTargetedBlockId(Minecraft minecraft) {
+        if (minecraft.screen != null || minecraft.level == null || minecraft.player == null) {
+            return false;
         }
 
         HitResult hitResult = minecraft.hitResult;
         if (!(hitResult instanceof BlockHitResult blockHitResult) || hitResult.getType() != HitResult.Type.BLOCK) {
-            return;
+            return false;
         }
 
         BlockPos pos = blockHitResult.getBlockPos();
         Block block = minecraft.level.getBlockState(pos).getBlock();
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
         INSTANCE.copyIdToClipboardAndNotify(minecraft, blockId);
+        return true;
     }
 
     private void clearLastTooltipItem() {
