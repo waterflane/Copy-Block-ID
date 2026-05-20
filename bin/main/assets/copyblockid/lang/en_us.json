@@ -1,4 +1,5 @@
 {
   "key.categories.copyblockid": "CopyBlockId",
-  "key.copyblockid.copy_block_id": "Copy targeted block ID"
+  "key.copyblockid.copy_block_id": "Copy targeted block ID",
+  "message.copyblockid.id_copied": "Copied ID: %s"
 }

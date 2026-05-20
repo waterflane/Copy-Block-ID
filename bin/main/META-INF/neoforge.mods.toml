@@ -4,10 +4,11 @@ license = "MIT"
 
 [[mods]]
 modId = "copyblockid"
-version = "1.0.0"
+version = "1.1.0"
 displayName = "CopyBlockId"
 authors = "wodichka"
-description = '''Client-side NeoForge mod that copies the targeted block ID to the clipboard with Ctrl+C.'''
+logoFile = "icon.png"
+description = '''Lightweight client-side NeoForge utility: press Ctrl+C to copy hovered inventory item IDs, JEI/REI ingredient IDs, fluid IDs, and configurable targeted block or entity IDs straight to the clipboard.'''
 
 [[dependencies."copyblockid"]]
 modId = "neoforge"
