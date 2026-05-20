@@ -8,13 +8,15 @@ When you look at a block and press `Ctrl+C`, the mod copies the block registry I
 minecraft:dirt
 ```
 
-The mod will also notify you in chat that the block ID has been copied.
+The mod will also show a hotbar-style overlay notification when something is copied.
 
 ---
 
 ## Features
 
 - Instantly copy block IDs from the world
+- Copies hovered inventory item IDs
+- Copies hovered item names from JEI and REI tooltips
 - Does not interfere with chat or GUI shortcuts
 - Lightweight and client-side only
 - Useful for:
@@ -60,7 +62,11 @@ Example output:
 minecraft:dirt
 ```
 
-`Ctrl+C` inside chats and menus is not intercepted by the mod.
+In supported inventory screens, `Ctrl+C` copies the hovered slot item ID.
+
+When hovering items in JEI or REI overlays, `Ctrl+C` copies the item's display name.
+
+`Ctrl+C` inside chats and focused text fields is not intercepted by the mod.
 
 ---
 
