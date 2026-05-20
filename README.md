@@ -16,7 +16,7 @@ The mod will also show a hotbar-style overlay notification when something is cop
 
 - Instantly copy block IDs from the world
 - Copies hovered inventory item IDs
-- Copies hovered item names from JEI and REI tooltips
+- Copies hovered item and fluid IDs from JEI and REI overlays/tooltips
 - Does not interfere with chat or GUI shortcuts
 - Lightweight and client-side only
 - Useful for:
@@ -64,7 +64,7 @@ minecraft:dirt
 
 In supported inventory screens, `Ctrl+C` copies the hovered slot item ID.
 
-When hovering items in JEI or REI overlays, `Ctrl+C` copies the item's display name.
+When hovering items or fluids in JEI or REI overlays, `Ctrl+C` copies the hovered ingredient registry ID.
 
 `Ctrl+C` inside chats and focused text fields is not intercepted by the mod.
 
