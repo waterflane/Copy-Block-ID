@@ -1,0 +1,91 @@
+plugins {
+    id "com.github.johnrengelman.shadow"
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+loom {
+    setGenerateSrgTiny(true)
+}
+
+configurations {
+    forge {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom forge
+    runtimeClasspath.extendsFrom forge
+    developmentForge.extendsFrom forge
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+dependencies {
+    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    compileOnly "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}:universal"
+    compileOnly "net.minecraftforge:javafmllanguage:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    compileOnly "net.minecraftforge:fmlcore:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    compileOnly "net.minecraftforge:fmlloader:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    compileOnly "net.minecraftforge:eventbus:6.0.5"
+    compileOnly "net.minecraftforge:mergetool-api:1.0"
+    compileOnly "com.electronwill.night-config:core:3.6.4"
+    compileOnly "org.spongepowered:mixin:0.8.5"
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowBundle project(path: ":common", configuration: "transformProductionForge")
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version_range", rootProject.minecraft_version_range
+    inputs.property "forge_loader_version_range", rootProject.forge_loader_version_range
+    inputs.property "mod_id", rootProject.mod_id
+    inputs.property "mod_name", rootProject.mod_name
+    inputs.property "mod_description", rootProject.mod_description
+    inputs.property "mod_authors", rootProject.mod_authors
+    inputs.property "mod_license", rootProject.mod_license
+
+    filesMatching("META-INF/mods.toml") {
+        expand(
+                version: project.version,
+                minecraft_version_range: rootProject.minecraft_version_range,
+                forge_loader_version_range: rootProject.forge_loader_version_range,
+                mod_id: rootProject.mod_id,
+                mod_name: rootProject.mod_name,
+                mod_description: rootProject.mod_description,
+                mod_authors: rootProject.mod_authors,
+                mod_license: rootProject.mod_license,
+                loader_mod_id: "forge"
+        )
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = "dev-shadow"
+    manifest {
+        attributes "MixinConfigs": "copyblockid.forge.mixins.json"
+    }
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    targetNamespace = "srg"
+}
+
+jar {
+    archiveClassifier = "dev"
+}

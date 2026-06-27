@@ -16,6 +16,7 @@ hs_err_pid*
 replay_pid*
 
 repo/
+releases/
 src/generated/
 
 !gradle/wrapper/gradle-wrapper.jar

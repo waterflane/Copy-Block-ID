@@ -1,0 +1,5 @@
+{
+  "key.categories.copyblockid": "CopyBlockId",
+  "key.copyblockid.copy_block_id": "Копировать ID выбранного блока",
+  "message.copyblockid.id_copied": "Скопирован ID: %s"
+}

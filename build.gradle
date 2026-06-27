@@ -1,96 +1,100 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'idea'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id "dev.architectury.loom" version "1.14-SNAPSHOT" apply false
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "com.github.johnrengelman.shadow" version "8.1.1" apply false
 }
 
-version = mod_version
-group = mod_group_id
-
-base {
-    archivesName = mod_id
+architectury {
+    minecraft = project.minecraft_version
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-neoForge {
-    version = project.neo_version
-
-    runs {
-        client {
-            client()
-        }
-
-        server {
-            server()
-            programArgument '--nogui'
-        }
-
-        data {
-            data()
-            programArguments.addAll '--mod', project.mod_id, '--all',
-                    '--output', file('src/generated/resources/').getAbsolutePath(),
-                    '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        configureEach {
-            logLevel = org.slf4j.event.Level.INFO
-        }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet(sourceSets.main)
-        }
-    }
+allprojects {
+    group = rootProject.mod_group_id
+    version = rootProject.mod_version
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+subprojects {
+    apply plugin: "dev.architectury.loom"
+    apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
 
-var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
-    var replaceProperties = [
-            minecraft_version      : minecraft_version,
-            minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
-            neo_version_range      : neo_version_range,
-            loader_version_range   : loader_version_range,
-            mod_id                 : mod_id,
-            mod_name               : mod_name,
-            mod_license            : mod_license,
-            mod_version            : mod_version,
-            mod_authors            : mod_authors,
-            mod_description        : mod_description
-    ]
-    inputs.properties replaceProperties
-    expand replaceProperties
-    from "src/main/templates"
-    into "build/generated/sources/modMetadata"
-}
-
-sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            from components.java
-        }
-    }
     repositories {
-        maven {
-            url "file://${project.projectDir}/repo"
+        maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+    }
+
+    base {
+        archivesName = "$rootProject.mod_id-$project.name"
+    }
+
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings loom.officialMojangMappings()
+    }
+
+    java {
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+        options.release = 17
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
+            }
         }
     }
 }
 
-idea {
-    module {
-        downloadSources = true
-        downloadJavadoc = true
+tasks.register("releaseJars", Copy) {
+    group = "build"
+    description = "Copies loader-ready CopyBlockId jars into the root releases directory."
+
+    dependsOn ":fabric:build", ":forge:build", ":neoforge:build"
+
+    into layout.projectDirectory.dir("releases")
+    from(project(":fabric").layout.buildDirectory.file("libs/${mod_id}-fabric-${mod_version}.jar"))
+    from(project(":forge").layout.buildDirectory.file("libs/${mod_id}-forge-${mod_version}.jar"))
+    from(project(":neoforge").layout.buildDirectory.file("libs/${mod_id}-neoforge-${mod_version}.jar"))
+
+    doLast {
+        def expectedMixins = [
+                forge   : "copyblockid.forge.mixins.json",
+                neoforge: "copyblockid.neoforge.mixins.json"
+        ]
+
+        expectedMixins.each { loader, mixinConfig ->
+            def jarPath = layout.projectDirectory.file("releases/${mod_id}-${loader}-${mod_version}.jar").asFile
+            if (!jarPath.isFile()) {
+                throw new GradleException("Missing release jar: ${jarPath}")
+            }
+
+            def jar = new java.util.jar.JarFile(jarPath)
+            try {
+                ["pack.mcmeta", "META-INF/mods.toml", mixinConfig].each { entryName ->
+                    if (jar.getEntry(entryName) == null) {
+                        throw new GradleException("${jarPath.name} is missing ${entryName}")
+                    }
+                }
+
+                def packMetadata = new groovy.json.JsonSlurper().parse(jar.getInputStream(jar.getEntry("pack.mcmeta")))
+                if (packMetadata.pack?.pack_format != 15) {
+                    throw new GradleException("${jarPath.name} has invalid Minecraft 1.20.1 pack metadata")
+                }
+
+                def declaredMixin = jar.manifest.mainAttributes.getValue("MixinConfigs")
+                if (declaredMixin != mixinConfig) {
+                    throw new GradleException("${jarPath.name} does not declare ${mixinConfig} in its manifest")
+                }
+            } finally {
+                jar.close()
+            }
+        }
     }
 }

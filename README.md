@@ -1,6 +1,6 @@
 # CopyBlockId
 
-CopyBlockId is a lightweight client-side utility mod for NeoForge 1.21.1. Press `Ctrl+C` to copy registry IDs directly from Minecraft without digging through debug screens, configs, or command output.
+CopyBlockId is a lightweight client-side utility mod for Minecraft 1.20.1 on Fabric, Forge, and NeoForge. Press `Ctrl+C` to copy registry IDs directly from Minecraft without digging through debug screens, configs, or command output.
 
 ## What It Copies
 
@@ -35,16 +35,21 @@ The shortcut is ignored while typing in chat or focused text fields.
 
 ## Config
 
-CopyBlockId creates a client config at `config/copyblockid-client.toml`.
+CopyBlockId creates a client config:
+
+- Fabric: `config/copyblockid-client.properties`
+- Forge/NeoForge: `config/copyblockid-client.toml`
 
 - `copyTargetedBlockInWorld = false` by default. Set it to `true` to allow `Ctrl+C` in the world to copy the ID of the block you are looking at
 - `copyTargetedEntityInWorld = false` by default. Set it to `true` to allow `Ctrl+C` in the world to copy the ID of the entity you are looking at
 
 ## Requirements
 
-- Minecraft `1.21.1`
-- NeoForge `21.1.230`
-- Java `21`
+- Minecraft `1.20.1`
+- Fabric Loader `0.16.10` + Fabric API `0.92.9+1.20.1`
+- Forge `47.4.20`
+- NeoForge `47.1.106`
+- Java `17`
 
 ## Build
 
@@ -52,12 +57,22 @@ CopyBlockId creates a client config at `config/copyblockid-client.toml`.
 .\gradlew.bat clean build
 ```
 
-The built jar will appear in `build/libs/`.
+The loader jars appear in each platform module's `build/libs/` directory.
+
+To build one platform at a time:
+
+```powershell
+.\gradlew.bat -Prequested_platforms=fabric -Penabled_platforms=fabric :fabric:build
+.\gradlew.bat -Prequested_platforms=forge -Penabled_platforms=forge :forge:build
+.\gradlew.bat -Prequested_platforms=neoforge -Penabled_platforms=neoforge :neoforge:build
+```
 
 ## Run Dev Client
 
 ```powershell
-.\gradlew.bat runClient
+.\gradlew.bat :fabric:runClient
+.\gradlew.bat :forge:runClient
+.\gradlew.bat :neoforge:runClient
 ```
 
 ## License
