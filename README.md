@@ -1,6 +1,6 @@
 # CopyBlockId
 
-CopyBlockId is a lightweight client-side utility mod for Minecraft 1.20.1 on Fabric, Forge, and NeoForge. Press `Ctrl+C` to copy registry IDs directly from Minecraft without digging through debug screens, configs, or command output.
+CopyBlockId is a lightweight client-side utility mod for Minecraft 1.20.1, 1.21.1 on Fabric, Forge, and NeoForge. Press `Ctrl+C` to copy registry IDs directly from Minecraft without digging through debug screens, configs, or command output.
 
 ## What It Copies
 
